@@ -18,8 +18,10 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 
 
+
+
 class MapActivity : AppCompatActivity(), OnMapReadyCallback,
-        GoogleMap.InfoWindowAdapter,
+        GoogleMap.InfoWindowAdapter, /*GoogleMap.OnMarkerClickListener*/
         MapContract.View {
 
     var longitude: Double? = null
@@ -145,5 +147,17 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback,
 
     }
 
+   /* override fun onMarkerClick(marker: Marker): Boolean {
+        if (true) {
+            val alertadd = AlertDialog.Builder(this)
+            val factory = LayoutInflater.from(this)
+            val view = factory.inflate(R.layout.dialog_layout, null)
+            alertadd.setView(view)
+            alertadd.show()
+            return true
+        }
+        return false
+    }
+*/
 
 }
