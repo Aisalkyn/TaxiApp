@@ -4,8 +4,10 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat
+import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
 import com.example.aisa.taxiapp.R
 import com.example.aisa.taxiapp.StartApplication
@@ -18,31 +20,15 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 
 
-
-
 class MapActivity : AppCompatActivity(), OnMapReadyCallback,
         GoogleMap.InfoWindowAdapter, /*GoogleMap.OnMarkerClickListener*/
         MapContract.View {
 
     var longitude: Double? = null
     var latitude: Double? = null
-    override fun onMapSuccess(model: MainModel) {
-        for (j in 0..model.companies!!.size - 1)
-        for (i in 0..model.companies!![j].drivers!!.size - 1) {
-            setMarker(LatLng(model.companies!![j].drivers!![i].lat!!, model.companies!![j].drivers!![i].lon!!))
-        }
-
-    }
-
-    override fun onMapFail(message: String) {
-        Log.d("errrrr", message)
-    }
-
     private lateinit var presenter: MapPresenter
-
-
-    private var mMap: GoogleMap? = null
     internal lateinit var mLocationRequest: LocationRequest
+    private var mMap: GoogleMap? = null
     private val LOCATION_PERMISSION = 100
     private var builder: LatLngBounds.Builder? = null
 
@@ -56,14 +42,6 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback,
 
     }
 
-    private fun init() {
-        getData()
-        val app: StartApplication = applicationContext as StartApplication
-        presenter = MapPresenter(app.service, this, this)
-        presenter.loadMap(this.latitude!!, this.longitude!!)
-
-    }
-
     override fun onMapReady(googleMap: GoogleMap?) {
         mMap = googleMap
         mMap!!.uiSettings.isZoomControlsEnabled = true
@@ -73,6 +51,17 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback,
         moveCameraDirection()
         setBranches()
     }
+
+    private fun init() {
+        getData()
+        val app: StartApplication = applicationContext as StartApplication
+        presenter = MapPresenter(app.service, this, this)
+        presenter.loadMap(this.latitude!!, this.longitude!!)
+
+
+
+    }
+
 
     fun setBranches() {
         builder = LatLngBounds.builder()
@@ -89,6 +78,8 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback,
         builder?.include(m?.position)
 
     }
+
+
 
 
     private fun getData() {
@@ -147,7 +138,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback,
 
     }
 
-   /* override fun onMarkerClick(marker: Marker): Boolean {
+    override fun onMarkerClick(marker: Marker): Boolean {
         if (true) {
             val alertadd = AlertDialog.Builder(this)
             val factory = LayoutInflater.from(this)
@@ -158,6 +149,16 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback,
         }
         return false
     }
-*/
 
+    override fun onMapSuccess(model: MainModel) {
+        for (j in 0..model.companies!!.size - 1)
+            for (i in 0..model.companies!![j].drivers!!.size - 1) {
+                setMarker(LatLng(model.companies!![j].drivers!![i].lat!!, model.companies!![j].drivers!![i].lon!!))
+            }
+
+    }
+
+    override fun onMapFail(message: String) {
+        Log.d("errrrr", message)
+    }
 }

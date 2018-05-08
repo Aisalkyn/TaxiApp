@@ -37,7 +37,6 @@ class MainActivity : AppCompatActivity(),   GoogleApiClient.ConnectionCallbacks,
     }
 
     private fun initMyLoc() {
-
         if (mGoogleApiClient == null) {
             mGoogleApiClient = GoogleApiClient.Builder(this)
                     .addConnectionCallbacks(this)
@@ -63,12 +62,11 @@ class MainActivity : AppCompatActivity(),   GoogleApiClient.ConnectionCallbacks,
         }
     }
     override fun onConnected(p0: Bundle?) {
-
         try {
 
             if (perm) {
                 val mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
-                        mGoogleApiClient);
+                        mGoogleApiClient)
                 if (mLastLocation != null) {
                     latitude = mLastLocation.getLatitude()
                     longitude = mLastLocation.getLongitude()
@@ -79,20 +77,19 @@ class MainActivity : AppCompatActivity(),   GoogleApiClient.ConnectionCallbacks,
         } catch (e: SecurityException) {
 
         }
-
     }
-
-
     override fun onConnectionSuspended(p0: Int) {
     }
 
     override fun onConnectionFailed(p0: ConnectionResult) {
     }
     private fun init(){
-        requestLocationPermission()
+
 
         initMyLoc()
+        Log.d("_-____________-__!", latitude.toString() + " " + longitude)
         button_find.setOnClickListener {
+            requestLocationPermission()
             val intent = Intent(this, MapActivity::class.java)
             intent.putExtra("lat", latitude!!)
             intent.putExtra("lon", longitude!!)
