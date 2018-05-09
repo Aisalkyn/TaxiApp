@@ -17,6 +17,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 
 
 
+@Suppress("DEPRECATION")
 class MainActivity : AppCompatActivity(),   GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
 
@@ -24,10 +25,10 @@ class MainActivity : AppCompatActivity(),   GoogleApiClient.ConnectionCallbacks,
     internal lateinit var mLocationRequest: LocationRequest
 
     private val LOCATION_PERMISSION = 100
-    var mGoogleApiClient: GoogleApiClient? = null
-    var longitude: Double? = null
-    var latitude: Double? = null
-    var perm: Boolean = false
+    private var mGoogleApiClient: GoogleApiClient? = null
+    private var longitude: Double? = null
+    private var latitude: Double? = null
+    private var perm: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,6 +62,7 @@ class MainActivity : AppCompatActivity(),   GoogleApiClient.ConnectionCallbacks,
             //mMap!!.isMyLocationEnabled = true
         }
     }
+
     override fun onConnected(p0: Bundle?) {
         try {
 
@@ -68,8 +70,8 @@ class MainActivity : AppCompatActivity(),   GoogleApiClient.ConnectionCallbacks,
                 val mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
                         mGoogleApiClient)
                 if (mLastLocation != null) {
-                    latitude = mLastLocation.getLatitude()
-                    longitude = mLastLocation.getLongitude()
+                    latitude = mLastLocation.latitude
+                    longitude = mLastLocation.longitude
                     Log.d("mm>>><<<", latitude.toString() + " " + longitude)
 
                 }
@@ -84,15 +86,13 @@ class MainActivity : AppCompatActivity(),   GoogleApiClient.ConnectionCallbacks,
     override fun onConnectionFailed(p0: ConnectionResult) {
     }
     private fun init(){
-
-
         initMyLoc()
         Log.d("_-____________-__!", latitude.toString() + " " + longitude)
         button_find.setOnClickListener {
             requestLocationPermission()
             val intent = Intent(this, MapActivity::class.java)
-            intent.putExtra("lat", latitude!!)
-            intent.putExtra("lon", longitude!!)
+            intent.putExtra("lat", latitude)
+            intent.putExtra("lon", longitude)
             startActivity(intent)
         }
     }

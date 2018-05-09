@@ -38,44 +38,41 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback,
         val mapFragment = supportFragmentManager
                 .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
-        init()
 
     }
 
     override fun onMapReady(googleMap: GoogleMap?) {
         mMap = googleMap
-        mMap!!.uiSettings.isZoomControlsEnabled = true
-        mMap!!.setInfoWindowAdapter(this)
+        mMap?.uiSettings?.isZoomControlsEnabled = true
+        mMap?.setInfoWindowAdapter(this)
         requestLocationPermission()
 
-        moveCameraDirection()
         setBranches()
+        init()
     }
 
     private fun init() {
         getData()
         val app: StartApplication = applicationContext as StartApplication
         presenter = MapPresenter(app.service, this, this)
-        presenter.loadMap(this.latitude!!, this.longitude!!)
-
-
-
+        if(latitude != null && longitude != null)
+            presenter.loadMap(this.latitude!!, this.longitude!!)
     }
 
 
     fun setBranches() {
         builder = LatLngBounds.builder()
-        getData()
-        moveCameraDirection()
     }
 
     private fun setMarker(latLng: LatLng) {
         val markerOptions = MarkerOptions()
                 .anchor(0.5f, 0.5f) // Anchors the marker on the bottom left
                 .position(latLng)
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_location))
-        val m = mMap?.addMarker(markerOptions)
+                .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_location))
+        mMap.let {
+            val m = it!!.addMarker(markerOptions)
         builder?.include(m?.position)
+        }
 
     }
 
@@ -105,11 +102,11 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback,
         mLocationRequest = LocationRequest()
         mLocationRequest.priority = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
         if (ActivityCompat.checkSelfPermission(applicationContext, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(applicationContext, Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(applicationContext, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISSION)
         } else {
-            mMap!!.isMyLocationEnabled = true
+            mMap?.isMyLocationEnabled = true
         }
     }
 
@@ -155,7 +152,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback,
             for (i in 0..model.companies!![j].drivers!!.size - 1) {
                 setMarker(LatLng(model.companies!![j].drivers!![i].lat!!, model.companies!![j].drivers!![i].lon!!))
             }
-
+        moveCameraDirection()
     }
 
     override fun onMapFail(message: String) {
