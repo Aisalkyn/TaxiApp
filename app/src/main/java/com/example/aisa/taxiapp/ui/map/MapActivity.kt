@@ -4,10 +4,8 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat
-import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
 import com.example.aisa.taxiapp.R
 import com.example.aisa.taxiapp.StartApplication
@@ -20,9 +18,12 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 
 
+
+
 class MapActivity : AppCompatActivity(), OnMapReadyCallback,
-        GoogleMap.InfoWindowAdapter, /*GoogleMap.OnMarkerClickListener*/
-        MapContract.View {
+        GoogleMap.InfoWindowAdapter,
+        MapContract.View/*, GoogleMap.OnMarkerClickListener*/ {
+
 
     var longitude: Double? = null
     var latitude: Double? = null
@@ -57,6 +58,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback,
         presenter = MapPresenter(app.service, this, this)
         if(latitude != null && longitude != null)
             presenter.loadMap(this.latitude!!, this.longitude!!)
+
     }
 
 
@@ -64,19 +66,40 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback,
         builder = LatLngBounds.builder()
     }
 
-    private fun setMarker(latLng: LatLng) {
+    private fun setMarkerSmsTaxi(latLng: LatLng, title: String) {
         val markerOptions = MarkerOptions()
                 .anchor(0.5f, 0.5f) // Anchors the marker on the bottom left
                 .position(latLng)
-                .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_location))
+                .title(title)
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.sms))
         mMap.let {
             val m = it!!.addMarker(markerOptions)
         builder?.include(m?.position)
         }
+       // mMap!!.setOnMarkerClickListener(this)
 
     }
 
 
+    private fun setMarkerNamba(latLng: LatLng, title: String) {
+        val markerOptions = MarkerOptions()
+                .anchor(0.5f, 0.5f) // Anchors the marker on the bottom left
+                .position(latLng)
+                .title(title)
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.namba ))
+
+        mMap.let {
+            val m = it!!.addMarker(markerOptions)
+            builder?.include(m?.position)
+        }
+
+    }
+
+//    override fun onMarkerClick(p0: Marker?): Boolean {
+//        Toast.makeText(this, "CLICKED"+ p0, Toast.LENGTH_LONG).show()
+//            return  true
+//
+//    }
 
 
     private fun getData() {
@@ -135,22 +158,26 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback,
 
     }
 
-    override fun onMarkerClick(marker: Marker): Boolean {
-        if (true) {
-            val alertadd = AlertDialog.Builder(this)
-            val factory = LayoutInflater.from(this)
-            val view = factory.inflate(R.layout.dialog_layout, null)
-            alertadd.setView(view)
-            alertadd.show()
-            return true
-        }
-        return false
-    }
 
+
+//    override fun onMapSuccess(model: MainModel) {
+//        for (j in 0 until model.companies!!.size)
+//            for (i in 0 until model.companies!![j].drivers!!.size) {
+//                setMarker(LatLng(model.companies!![j].drivers!![i].lat!!, model.companies!![j].drivers!![i].lon!!))
+//            }
+//        moveCameraDirection()
+//    }
     override fun onMapSuccess(model: MainModel) {
-        for (j in 0..model.companies!!.size - 1)
-            for (i in 0..model.companies!![j].drivers!!.size - 1) {
-                setMarker(LatLng(model.companies!![j].drivers!![i].lat!!, model.companies!![j].drivers!![i].lon!!))
+            for (i in 0 until model.companies!![0].drivers!!.size) {
+                setMarkerSmsTaxi(LatLng(model.companies!![0].drivers!![i].lat!!,
+                        model.companies!![0].drivers!![i].lon!!),
+                        model.companies!![0].name!!)
+            }
+            for (i in 0 until model.companies!![1].drivers!!.size) {
+                setMarkerNamba(LatLng(model.companies!![1].drivers!![i].lat!!,
+                        model.companies!![1].drivers!![i].lon!!),
+                        model.companies!![1].name!!
+                       )
             }
         moveCameraDirection()
     }

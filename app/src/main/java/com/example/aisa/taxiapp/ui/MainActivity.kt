@@ -1,6 +1,7 @@
 package com.example.aisa.taxiapp.ui
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -13,6 +14,7 @@ import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.GoogleMap
 import kotlinx.android.synthetic.main.activity_main.*
 
 
@@ -29,6 +31,8 @@ class MainActivity : AppCompatActivity(),   GoogleApiClient.ConnectionCallbacks,
     private var longitude: Double? = null
     private var latitude: Double? = null
     private var perm: Boolean = false
+    private var mMap: GoogleMap? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,6 +40,24 @@ class MainActivity : AppCompatActivity(),   GoogleApiClient.ConnectionCallbacks,
         init()
 
     }
+    private fun init(){
+        initMyLoc()
+        initBtn()
+
+    }
+    @SuppressLint("MissingPermission")
+    override fun onConnected(p0: Bundle?) {
+
+        val mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+                mGoogleApiClient)
+        if (mLastLocation != null) {
+            latitude = mLastLocation.latitude
+            longitude = mLastLocation.longitude
+            Log.d("mm>>><<<", latitude.toString() + " " + longitude)
+
+        }
+    }
+
 
     private fun initMyLoc() {
         if (mGoogleApiClient == null) {
@@ -59,37 +81,20 @@ class MainActivity : AppCompatActivity(),   GoogleApiClient.ConnectionCallbacks,
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISSION)
             perm = true
         } else {
-            //mMap!!.isMyLocationEnabled = true
+           // mMap!!.isMyLocationEnabled = true
         }
     }
 
-    override fun onConnected(p0: Bundle?) {
-        try {
-
-            if (perm) {
-                val mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
-                        mGoogleApiClient)
-                if (mLastLocation != null) {
-                    latitude = mLastLocation.latitude
-                    longitude = mLastLocation.longitude
-                    Log.d("mm>>><<<", latitude.toString() + " " + longitude)
-
-                }
-            }
-        } catch (e: SecurityException) {
-
-        }
-    }
     override fun onConnectionSuspended(p0: Int) {
     }
 
     override fun onConnectionFailed(p0: ConnectionResult) {
     }
-    private fun init(){
-        initMyLoc()
-        Log.d("_-____________-__!", latitude.toString() + " " + longitude)
+
+    private fun initBtn(){
         button_find.setOnClickListener {
             requestLocationPermission()
+            Log.d("_-____________-_!", latitude.toString() + " " + longitude)
             val intent = Intent(this, MapActivity::class.java)
             intent.putExtra("lat", latitude)
             intent.putExtra("lon", longitude)
