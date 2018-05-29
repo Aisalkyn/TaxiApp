@@ -1,5 +1,6 @@
 package com.example.aisa.taxiapp.ui.map
 
+import com.example.aisa.taxiapp.model.Company
 import com.example.aisa.taxiapp.model.MainModel
 
 interface MapContract {

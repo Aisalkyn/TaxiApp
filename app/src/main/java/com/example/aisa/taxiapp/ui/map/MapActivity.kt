@@ -50,6 +50,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback,
         val mapFragment = supportFragmentManager
                 .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+        infoWindoAdapter = CustomInfoWindowAdapter(this)
 
     }
 
@@ -148,10 +149,12 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback,
             for (i in 0 until (model.companies!![j].drivers!!.size)) {
                 val cars = LatLng(model.companies!![j].drivers!![i].lat!!, model.companies!![j].drivers!![i].lon!!)
                 marker = mMap?.addMarker(MarkerOptions().position(cars)!!
-                        .flat(true)
-                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.namba)))
+                        .flat(false)
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.nnamb)))
+
                 mMap?.setInfoWindowAdapter(infoWindoAdapter)
-                marker?.tag = model
+                marker?.tag = model.companies!![j]
+
                 Log.i("onMap_____________FFSDF", marker?.tag.toString())
 
             }
