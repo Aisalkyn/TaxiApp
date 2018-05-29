@@ -25,9 +25,12 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import kotlinx.android.synthetic.main.item_of_company.view.*
+import android.content.Intent
+import android.net.Uri
+import com.example.aisa.taxiapp.model.Company
 
 
-class MapActivity : AppCompatActivity(), OnMapReadyCallback,
+class MapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         MapContract.View {
@@ -38,9 +41,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback,
     private var mMap: GoogleMap? = null
     private val LOCATION_PERMISSION = 100
     private var builder: LatLngBounds.Builder? = null
-    private var model: MainModel? = null
-    private var builderAl: AlertDialog.Builder? = null
-    private var alertDialog: AlertDialog? = null
+    private var company: Company? = null
     private var infoWindoAdapter: CustomInfoWindowAdapter? = null
     private var marker: Marker? = null
 
@@ -60,6 +61,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback,
         if (checkLocationPermission()) {
             init()
         }
+        mMap?.setOnInfoWindowClickListener(this)
 
     }
 
@@ -78,32 +80,12 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback,
             presenter.loadMap(mLastLocation.latitude, mLastLocation.longitude)
 
     }
-//    private fun setMarker(latLng: LatLng) {
-//        val markerOptions = MarkerOptions()
-//                .anchor(0.5f, 0.5f) // Anchors the marker on the bottom left
-//                .position(latLng)
-//                //.title(title)
-//               // .snippet(contact)
-//                .icon(BitmapDescriptorFactory.fromResource(R.drawable.namba))
-//
-//        mMap.let {
-//            val marker = it!!.addMarker(markerOptions)
-//            builder?.include(marker?.position)
-//            marker.tag
-//        }
-//        //mMap!!.setOnMarkerClickListener { onTaxiClick() }
-//    }
+    override fun onInfoWindowClick(p0: Marker?) {
+        val r = p0?.tag as Company
+        val m = r.contacts!![1].contact
 
-    fun onTaxiClick(model: Contact, name: String, image: String): Boolean {
-        val view = LayoutInflater.from(this).inflate(R.layout.item_taxi, null, false)
-        view.phone.text = model.contact
-        view.name.text = name
-        // view.company_logo.setImageBitmap()
-        builderAl = AlertDialog.Builder(this).setView(view)
-        alertDialog = builderAl!!.create()
-        alertDialog!!.show()
-
-        return true
+        val callIntent = Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", m, null) )
+        startActivity(callIntent)
 
     }
 
@@ -157,10 +139,13 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback,
 
                 Log.i("onMap_____________FFSDF", marker?.tag.toString())
 
+
             }
 
         moveCameraDirection()
     }
+
+
 
     override fun onMapFail(message: String) {
         Log.d("errrrr", message)
